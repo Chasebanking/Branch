@@ -1,7 +1,4 @@
-// Lightweight client-side handlers.
-// IMPORTANT: This example assumes real auth/transactions are handled on the server.
-// Do NOT keep real credentials or transaction logic entirely in front-end code.
-
+// Lightweight client-side handlers
 document.addEventListener("DOMContentLoaded", () => {
   // Login
   const loginForm = document.getElementById("login-form");
@@ -11,9 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
 
-  // Send Money
+  // Send Money / Transfer Form
   const sendForm = document.getElementById("send-money-form");
   if (sendForm) sendForm.addEventListener("submit", handleSendMoney);
+
+  // Toggle Transfer Form
+  const toggleBtn = document.getElementById("toggle-transfer-btn");
+  if (toggleBtn && sendForm) {
+    toggleBtn.addEventListener("click", () => {
+      if (sendForm.style.display === "none") {
+        sendForm.style.display = "block";
+        toggleBtn.textContent = "Hide Transfer Form";
+      } else {
+        sendForm.style.display = "none";
+        toggleBtn.textContent = "Show Transfer Form";
+      }
+    });
+  }
 });
 
 // ===== Login handler =====
@@ -29,11 +40,9 @@ function handleLogin(event) {
     return;
   }
 
-  // Show loading message
   messageEl.style.color = "blue";
   messageEl.textContent = "Checking credentials...";
 
-  // Simulate server delay
   setTimeout(() => {
     if (username === "John Williams" && password === "Password123") {
       messageEl.style.color = "green";
@@ -51,12 +60,12 @@ function handleLogin(event) {
 
 // ===== Logout handler =====
 function handleLogout(event) {
-  // Optional: call server logout endpoint
   window.location.href = "index.html";
 }
 
-document.getElementById("send-money-form").addEventListener("submit", function(e) {
-  e.preventDefault(); // prevent form from reloading page
+// ===== Send Money handler =====
+function handleSendMoney(e) {
+  e.preventDefault();
 
   const bank = document.getElementById("bank").value;
   const account = document.getElementById("account").value;
@@ -70,19 +79,5 @@ document.getElementById("send-money-form").addEventListener("submit", function(e
   }
 
   alert(`Successfully sent $${amount} to ${recipient} (${bank})`);
-  this.reset(); // clear form
-});
-
-// Toggle Transfer Form
-const toggleBtn = document.getElementById("toggle-transfer-btn");
-const sendForm = document.getElementById("send-money-form");
-
-toggleBtn.addEventListener("click", () => {
-  if (sendForm.style.display === "none") {
-    sendForm.style.display = "block";
-    toggleBtn.textContent = "Hide Transfer Form";
-  } else {
-    sendForm.style.display = "none";
-    toggleBtn.textContent = "Show Transfer Form";
-  }
-});
+  e.target.reset();
+}
