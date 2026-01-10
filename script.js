@@ -17,3 +17,18 @@ function sendMoney() {
     alert("Please fill in all fields.");
   }
 }
+
+function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  // DEMO credentials (not real)
+  const DEMO_USER = "John Williams";
+  const DEMO_PASS = "password123";
+
+  if (username === DEMO_USER && password === DEMO_PASS) {
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Invalid username or password");
+  }
+}
