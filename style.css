@@ -450,3 +450,7 @@ canvas#spendingChart { width: 100% !important; height: 200px !important; }
   width: 100% !important;
   height: 100% !important;
 }
+
+.spending-trends-card {
+  height: 400px; /* more vertical space for the chart */
+}
