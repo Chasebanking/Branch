@@ -354,13 +354,14 @@ canvas#spendingChart { width: 100% !important; height: 200px !important; }
   align-items: center;
 }
 
+
 #toggle-balance {
   background: none;
   border: none;
-  font-size: 18px;
   cursor: pointer;
+  padding: 4px;
 }
 
-.hidden {
-  letter-spacing: 4px;
+#toggle-balance svg {
+  display: block;
 }
