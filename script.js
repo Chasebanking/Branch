@@ -29,6 +29,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+const eyeOpen = document.getElementById("eye-open");
+const eyeClosed = document.getElementById("eye-closed");
+const toggleBtn = document.getElementById("toggle-balance");
+const sensitiveBalances = document.querySelectorAll(".sensitive");
+
+let visible = true;
+
+// store original values
+const originalValues = [];
+sensitiveBalances.forEach(el => {
+  originalValues.push(el.textContent);
+});
+
+toggleBtn.addEventListener("click", () => {
+  sensitiveBalances.forEach((el, index) => {
+    if (visible) {
+      el.textContent = "••••••";
+      el.classList.add("hidden");
+    } else {
+      el.textContent = originalValues[index];
+      el.classList.remove("hidden");
+    }
+  });
+
+  if (visible) {
+  eyeOpen.style.display = "none";
+  eyeClosed.style.display = "block";
+} else {
+  eyeOpen.style.display = "block";
+  eyeClosed.style.display = "none";
+}
+  
+  visible = !visible;
+});
+}
+  
   // ===== DASHBOARD =====
   const sendForm = document.getElementById("send-money-form");
   const toggleBtn = document.getElementById("toggle-transfer-btn");
@@ -186,38 +222,4 @@ balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFr
   const logoutBtn = document.getElementById("logout-btn");
   logoutBtn && logoutBtn.addEventListener("click", () => window.location.href = "index.html");
 
-});
-const eyeOpen = document.getElementById("eye-open");
-const eyeClosed = document.getElementById("eye-closed");
-const toggleBtn = document.getElementById("toggle-balance");
-const sensitiveBalances = document.querySelectorAll(".sensitive");
-
-let visible = true;
-
-// store original values
-const originalValues = [];
-sensitiveBalances.forEach(el => {
-  originalValues.push(el.textContent);
-});
-
-toggleBtn.addEventListener("click", () => {
-  sensitiveBalances.forEach((el, index) => {
-    if (visible) {
-      el.textContent = "••••••";
-      el.classList.add("hidden");
-    } else {
-      el.textContent = originalValues[index];
-      el.classList.remove("hidden");
-    }
-  });
-
-  if (visible) {
-  eyeOpen.style.display = "none";
-  eyeClosed.style.display = "block";
-} else {
-  eyeOpen.style.display = "block";
-  eyeClosed.style.display = "none";
-}
-  
-  visible = !visible;
 });
