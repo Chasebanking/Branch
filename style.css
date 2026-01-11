@@ -434,3 +434,8 @@ canvas#spendingChart { width: 100% !important; height: 200px !important; }
 #profile-panel .profile-actions #close-profile:hover {
   background: #999;
 }
+
+.spending-trends-card canvas {
+  height: 300px; /* adjust as needed */
+  width: 100%;
+}
