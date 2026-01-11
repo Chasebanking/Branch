@@ -19,10 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         if (username === "John Williams" && password === "Password123") {
-          messageEl && (messageEl.style.color = "green", messageEl.textContent = "Login successful! Redirecting...");
+          if (messageEl) {
+            messageEl.style.color = "green";
+            messageEl.textContent = "Login successful! Redirecting...";
+          }
           setTimeout(() => window.location.href = "dashboard.html", 1000);
         } else {
-          messageEl && (messageEl.style.color = "red", messageEl.textContent = "Invalid username or password.");
+          if (messageEl) {
+            messageEl.style.color = "red";
+            messageEl.textContent = "Invalid username or password.";
+          }
           alert("Invalid username or password.");
         }
       }, 1500);
@@ -31,21 +37,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== DASHBOARD =====
   const sendForm = document.getElementById("send-money-form");
-  const toggleBtn = document.getElementById("toggle-transfer-btn");
+  const toggleTransferBtn = document.getElementById("toggle-transfer-btn");
   const balanceEl = document.querySelector(".balance");
   const transactionsList = document.querySelector(".transactions-card ul");
 
-// Step 1: Check localStorage first
-let totalBalance = parseFloat(localStorage.getItem("totalBalance"));
+  // Balance
+  let totalBalance = parseFloat(localStorage.getItem("totalBalance"));
+  if (!totalBalance) {
+    totalBalance = balanceEl ? parseFloat(balanceEl.textContent.replace(/[$,]/g, "")) : 0;
+  }
+  balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// Step 2: If nothing saved, use HTML value
-if (!totalBalance) {
-  totalBalance = balanceEl ? parseFloat(balanceEl.textContent.replace(/[$,]/g, "")) : 0;
-}
-
-// Step 3: Show the balance on the page
-balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
+  // Transactions
   const savedTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
   if (transactionsList) {
     savedTransactions.forEach(tx => {
@@ -56,19 +59,18 @@ balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFr
     });
   }
 
-  // Update balance display
-  balanceEl && (balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
   // Toggle Transfer Form
-  toggleBtn && sendForm && toggleBtn.addEventListener("click", () => {
-    if (sendForm.style.display === "none") {
-      sendForm.style.display = "block";
-      toggleBtn.textContent = "Hide Transfer Form";
-    } else {
-      sendForm.style.display = "none";
-      toggleBtn.textContent = "Transfer Funds";
-    }
-  });
+  if (toggleTransferBtn && sendForm) {
+    toggleTransferBtn.addEventListener("click", () => {
+      if (sendForm.style.display === "none") {
+        sendForm.style.display = "block";
+        toggleTransferBtn.textContent = "Hide Transfer Form";
+      } else {
+        sendForm.style.display = "none";
+        toggleTransferBtn.textContent = "Transfer Funds";
+      }
+    });
+  }
 
   // ===== PIN MODAL =====
   const pinModal = document.createElement("div");
@@ -95,141 +97,142 @@ balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFr
   const pinMessage = document.getElementById("pinMessage");
   const confirmBtn = document.getElementById("confirmPinBtn");
   const cancelBtn = document.getElementById("cancelPinBtn");
-  const correctPin = "2027"; // <-- editable PIN
+  const correctPin = "2027";
 
-  // Cancel button
   cancelBtn.onclick = () => pinModal.style.display = "none";
 
   // Send Money Submission
   if (sendForm && balanceEl && transactionsList) {
-  const amountInput = document.getElementById("amount");
-  const recipientInput = document.getElementById("recipient");
-  const bankSelect = document.getElementById("bank");
-  const noteInput = document.getElementById("note");
-  const sendBtn = document.getElementById("send-btn");
-  const maxAttempts = 3; // max PIN tries
+    const amountInput = document.getElementById("amount");
+    const recipientInput = document.getElementById("recipient");
+    const bankSelect = document.getElementById("bank");
+    const noteInput = document.getElementById("note");
+    const sendBtn = document.getElementById("send-btn");
+    const maxAttempts = 3;
 
-  sendForm.addEventListener("submit", (e) => {
-    e.preventDefault();
+    sendForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const amount = parseFloat(amountInput.value);
-    const recipient = recipientInput.value.trim();
-    const bank = bankSelect.value;
-    const note = noteInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const recipient = recipientInput.value.trim();
+      const bank = bankSelect.value;
+      const note = noteInput.value.trim();
 
-    if (!bank || !recipient || isNaN(amount) || amount <= 0) return alert("Fill all fields correctly.");
-    if (amount > totalBalance) return alert("Insufficient funds.");
+      if (!bank || !recipient || isNaN(amount) || amount <= 0) return alert("Fill all fields correctly.");
+      if (amount > totalBalance) return alert("Insufficient funds.");
 
-    // Show PIN modal
-    pinModal.style.display = "flex";
-    pinInput.value = "";
-    pinMessage.textContent = "";
-    pinInput.focus();
-    let attemptsLeft = maxAttempts;
+      // Show PIN modal
+      pinModal.style.display = "flex";
+      pinInput.value = "";
+      pinMessage.textContent = "";
+      pinInput.focus();
+      let attemptsLeft = maxAttempts;
 
-    // Confirm button handler
-    confirmBtn.onclick = () => {
-      const enteredPin = pinInput.value.trim();
-      if (enteredPin !== correctPin) {
-        attemptsLeft--;
-        if (attemptsLeft > 0) {
-          pinMessage.textContent = `Incorrect PIN. ${attemptsLeft} attempt(s) remaining.`;
-          pinInput.value = "";
-          pinInput.focus();
-        } else {
-          pinMessage.textContent = "Maximum attempts reached. Try again later.";
-          setTimeout(() => pinModal.style.display = "none", 1000);
+      confirmBtn.onclick = () => {
+        const enteredPin = pinInput.value.trim();
+        if (enteredPin !== correctPin) {
+          attemptsLeft--;
+          if (attemptsLeft > 0) {
+            pinMessage.textContent = `Incorrect PIN. ${attemptsLeft} attempt(s) remaining.`;
+            pinInput.value = "";
+            pinInput.focus();
+          } else {
+            pinMessage.textContent = "Maximum attempts reached. Try again later.";
+            setTimeout(() => pinModal.style.display = "none", 1000);
+          }
+          return;
         }
-        return;
-      }
 
-      // Correct PIN — proceed with transfer
-      pinModal.style.display = "none";
-      sendBtn.disabled = true;
-      const originalText = sendBtn.textContent;
-      let dots = 0;
-      sendBtn.textContent = "Processing";
-      const loader = setInterval(() => {
-        dots = (dots + 1) % 4;
-        sendBtn.textContent = "Processing" + ".".repeat(dots);
-      }, 400);
+        // Correct PIN
+        pinModal.style.display = "none";
+        sendBtn.disabled = true;
+        const originalText = sendBtn.textContent;
+        let dots = 0;
+        sendBtn.textContent = "Processing";
+        const loader = setInterval(() => {
+          dots = (dots + 1) % 4;
+          sendBtn.textContent = "Processing" + ".".repeat(dots);
+        }, 400);
 
-      setTimeout(() => {
-        clearInterval(loader);
-        totalBalance -= amount;
-        balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        setTimeout(() => {
+          clearInterval(loader);
+          totalBalance -= amount;
+          balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        const li = document.createElement("li");
-        li.classList.add("expense");
-        li.innerHTML = `<span>Transfer to ${recipient} (${bank})${note ? " — " + note : ""}</span><span>-$${amount.toLocaleString()}</span>`;
-        transactionsList.insertBefore(li, transactionsList.firstChild);
+          const li = document.createElement("li");
+          li.classList.add("expense");
+          li.innerHTML = `<span>Transfer to ${recipient} (${bank})${note ? " — " + note : ""}</span><span>-$${amount.toLocaleString()}</span>`;
+          transactionsList.insertBefore(li, transactionsList.firstChild);
 
-        savedTransactions.unshift({
-          type: "expense",
-          text: `Transfer to ${recipient} (${bank})${note ? " — " + note : ""}`,
-          amount: "-$" + amount.toLocaleString()
-        });
+          savedTransactions.unshift({
+            type: "expense",
+            text: `Transfer to ${recipient} (${bank})${note ? " — " + note : ""}`,
+            amount: "-$" + amount.toLocaleString()
+          });
 
-        localStorage.setItem("totalBalance", totalBalance);
-        localStorage.setItem("transactions", JSON.stringify(savedTransactions));
+          localStorage.setItem("totalBalance", totalBalance);
+          localStorage.setItem("transactions", JSON.stringify(savedTransactions));
 
-        alert(`Transfer of $${amount.toLocaleString()} to ${recipient}${note ? " — " + note : ""} successful ✔`);
-        sendForm.reset();
-        sendBtn.disabled = false;
-        sendBtn.textContent = originalText;
-      }, 2000);
-    };
-  });
-}
-  
-  // Logout
+          alert(`Transfer of $${amount.toLocaleString()} to ${recipient}${note ? " — " + note : ""} successful ✔`);
+          sendForm.reset();
+          sendBtn.disabled = false;
+          sendBtn.textContent = originalText;
+        }, 2000);
+      };
+    });
+  }
+
+  // ===== LOGOUT =====
   const logoutBtn = document.getElementById("logout-btn");
   logoutBtn && logoutBtn.addEventListener("click", () => window.location.href = "index.html");
 
-});
+  // ===== BALANCE TOGGLE =====
+  const balanceToggleBtn = document.getElementById("toggle-balance");
+  const sensitiveBalances = document.querySelectorAll(".sensitive");
+  let visible = true;
+  const originalValues = [];
+  sensitiveBalances.forEach(el => originalValues.push(el.textContent));
 
-const toggleBtn = document.getElementById("toggle-balance");
-const sensitiveBalances = document.querySelectorAll(".sensitive");
-
-let visible = true;
-
-// store original values
-const originalValues = [];
-sensitiveBalances.forEach(el => {
-  originalValues.push(el.textContent);
-});
-
-toggleBtn.addEventListener("click", () => {
-  sensitiveBalances.forEach((el, index) => {
-    if (visible) {
-      el.textContent = "••••••";
-      el.classList.add("hidden");
-    } else {
-      el.textContent = originalValues[index];
-      el.classList.remove("hidden");
-    }
+  balanceToggleBtn && balanceToggleBtn.addEventListener("click", () => {
+    sensitiveBalances.forEach((el, index) => {
+      if (visible) {
+        el.textContent = "••••••";
+        el.classList.add("hidden");
+      } else {
+        el.textContent = originalValues[index];
+        el.classList.remove("hidden");
+      }
+    });
+    balanceToggleBtn.textContent = visible ? "👁‍🗨" : "👁";
+    visible = !visible;
   });
 
-  toggleBtn.textContent = visible ? "👁‍🗨" : "👁";
-  visible = !visible;
-});
+  // ===== PROFILE PANEL =====
+  const profileBtn = document.getElementById("profile-btn");
+  const profilePanel = document.getElementById("profile-panel");
+  const closeProfileBtn = document.getElementById("close-profile");
 
-// Profile Panel Toggle
-const profileBtn = document.getElementById("profile-btn");
-const profilePanel = document.getElementById("profile-panel");
-const closeProfileBtn = document.getElementById("close-profile");
+  if (profileBtn && profilePanel && closeProfileBtn) {
+    // Toggle panel
+    profileBtn.addEventListener("click", () => {
+      profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
+    });
 
-profileBtn.addEventListener("click", () => {
-  profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
-});
+    // Close button inside panel
+    closeProfileBtn.addEventListener("click", () => {
+      profilePanel.style.display = "none";
+    });
 
-closeProfileBtn.addEventListener("click", () => {
-  profilePanel.style.display = "none";
-});
-
-// Optional: close panel if clicked outside
-window.addEventListener("click", (e) => {
-  if (profilePanel.style.display === "block" && !profilePanel.contains(e.target) && !profileBtn.contains(e.target)) {
-    profilePanel.style.display = "none";
+    // Click outside to close
+    document.addEventListener("click", (e) => {
+      if (
+        profilePanel.style.display === "block" &&
+        !profilePanel.contains(e.target) &&
+        !profileBtn.contains(e.target)
+      ) {
+        profilePanel.style.display = "none";
+      }
+    });
   }
+
 });
