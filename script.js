@@ -8,9 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { type: "expense", text: "Netflix — Entertainment", amount: "$15", date: "2026-01-20" },
     { type: "expense", text: "Rent — Housing", amount: "$500", date: "2026-01-01" }
   ]));
-
-  const savedTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  console.log(savedTransactions);
+  
 
   // ===== 2️⃣ LOGIN HANDLER =====
   const loginForm = document.getElementById("login-form");
