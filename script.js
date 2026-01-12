@@ -214,7 +214,16 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
   }
+    // Quick buttons & cards
+const quickBtns = document.querySelectorAll('.quick-btn');
+const payBillCard = document.querySelector('.pay-bill-card');
+const requestMoneyCard = document.querySelector('.request-money-card');
 
+// Hide forms initially
+if (payBillCard) payBillCard.style.display = 'none';
+if (requestMoneyCard) requestMoneyCard.style.display = 'none';
+if (sendForm) sendForm.style.display = 'none';
+     
     quickBtns.forEach(btn => {
     btn.addEventListener('click', () => {
     const action = btn.dataset.action;
