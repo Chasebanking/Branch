@@ -366,9 +366,9 @@ if (requestMoneyForm && transactionsList) {
 
    // ===== DEMO USER =====
 const demoUser = {
-  fullName: "John Williams",
-  email: "jsonwilliams084@gmail.com",
-  phone: "+1 903 1408 203",
+  fullName: "Charles Williams",
+  email: "Charlesweahh@gmail.com",
+  phone: "+1 510 367 1796",
   password: "1346852",
   emailNotif: true,
   smsNotif: false
