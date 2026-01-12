@@ -269,27 +269,8 @@ if (logoutBtn) logoutBtn.addEventListener("click", () => {
     }
   });
 });
-   
-  // ===== PROFILE PANEL =====
-  const profileBtn = document.getElementById("profile-btn");
-  const profilePanel = document.getElementById("profile-panel");
-  const closeProfileBtn = document.getElementById("close-profile");
 
-  if (profileBtn && profilePanel && closeProfileBtn) {
-    profileBtn.addEventListener("click", () => {
-      profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
-    });
-    closeProfileBtn.addEventListener("click", () => profilePanel.style.display = "none");
-    document.addEventListener("click", (e) => {
-      if (profilePanel.style.display === "block" && !profilePanel.contains(e.target) && !profileBtn.contains(e.target)) {
-        profilePanel.style.display = "none";
-      }
-    });
-  }
-
-});
-
-   document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
   const profileBtn = document.getElementById("profile-btn");
   const profilePanel = document.getElementById("profile-panel");
   const closeProfileBtn = document.getElementById("close-profile");
@@ -321,13 +302,13 @@ if (logoutBtn) logoutBtn.addEventListener("click", () => {
   // Redirect buttons
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", () => {
-      window.location.href = "profile.html"; // make sure this page exists
+      window.location.href = "profile.html"; // ensure this page exists
     });
   }
 
   if (accountSettingsBtn) {
     accountSettingsBtn.addEventListener("click", () => {
-      window.location.href = "account.html"; // make sure this page exists
+      window.location.href = "account.html"; // ensure this page exists
     });
   }
 });
