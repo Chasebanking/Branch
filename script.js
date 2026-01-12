@@ -236,6 +236,87 @@ quickBtns.forEach(btn => {
     }
   });
 });
+
+  // ===== PAY BILL =====
+const payBillForm = document.getElementById("pay-bill-form");
+
+if (payBillForm && balanceEl && transactionsList) {
+  payBillForm.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const biller = document.getElementById("biller").value.trim();
+    const amount = parseFloat(document.getElementById("bill-amount").value);
+
+    if (!biller || isNaN(amount) || amount <= 0) {
+      return alert("Enter valid bill details.");
+    }
+
+    if (amount > totalBalance) {
+      return alert("Insufficient balance.");
+    }
+
+    // Deduct balance
+    totalBalance -= amount;
+    localStorage.setItem("totalBalance", totalBalance);
+    balanceEl.textContent =
+      "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Save transaction
+    const tx = {
+      type: "expense",
+      text: `Bill Payment — ${biller}`,
+      amount: `-$${amount.toLocaleString()}`,
+      date: new Date().toISOString().split("T")[0]
+    };
+
+    savedTransactions.unshift(tx);
+    localStorage.setItem("transactions", JSON.stringify(savedTransactions));
+
+    // Update UI
+    const li = document.createElement("li");
+    li.className = "expense";
+    li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
+    transactionsList.insertBefore(li, transactionsList.firstChild);
+
+    alert("Bill paid successfully ✔");
+    payBillForm.reset();
+  });
+}
+
+
+// ===== REQUEST MONEY =====
+const requestMoneyForm = document.getElementById("request-money-form");
+
+if (requestMoneyForm && transactionsList) {
+  requestMoneyForm.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const name = document.getElementById("request-recipient").value.trim();
+    const amount = parseFloat(document.getElementById("request-amount").value);
+
+    if (!name || isNaN(amount) || amount <= 0) {
+      return alert("Enter valid request details.");
+    }
+
+    const tx = {
+      type: "income",
+      text: `Money Requested from ${name}`,
+      amount: `$${amount.toLocaleString()}`,
+      date: new Date().toISOString().split("T")[0]
+    };
+
+    savedTransactions.unshift(tx);
+    localStorage.setItem("transactions", JSON.stringify(savedTransactions));
+
+    const li = document.createElement("li");
+    li.className = "income";
+    li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
+    transactionsList.insertBefore(li, transactionsList.firstChild);
+
+    alert("Money request sent ✔");
+    requestMoneyForm.reset();
+  });
+}
   
   // ===== LOGOUT =====
   const logoutBtn = document.getElementById("logout-btn");
