@@ -203,7 +203,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 400);
 
   setTimeout(() => {
-    clearInterval(loader);           // stop the loader
+    clearInterval(loader);
+    sendForm.style.display = "none";
+    toggleTransferBtn.textContent = "Transfer Funds";// stop the loader
     window.location.href = "error.html"; // go straight to error page
   }, 4000); // 4 seconds now
 
@@ -247,6 +249,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   };
 });
+     sendForm.style.display = "none";
+     toggleTransferBtn.textContent = "Transfer Funds";
 
           
 // ===== Quick buttons & cards =====
