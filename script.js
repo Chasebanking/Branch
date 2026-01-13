@@ -137,103 +137,96 @@ document.addEventListener("DOMContentLoaded", () => {
   const correctPin = "2027";
   cancelBtn.onclick = () => pinModal.style.display = "none";
 
-  // ===== SEND MONEY =====
-  if (sendForm && balanceEl && transactionsList) {
-    const amountInput = document.getElementById("amount");
-    const recipientInput = document.getElementById("recipient");
-    const bankSelect = document.getElementById("bank");
-    const noteInput = document.getElementById("note");
-    const sendBtn = document.getElementById("send-btn");
-    const maxAttempts = 3;
+  const accountInput = document.getElementById("account"); // added
+  const amountInput = document.getElementById("amount");
+  const recipientInput = document.getElementById("recipient");
+  const bankSelect = document.getElementById("bank");
+  const noteInput = document.getElementById("note");
+  const sendBtn = document.getElementById("send-btn");
+  const maxAttempts = 3;
 
-    sendForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const amount = parseFloat(amountInput.value);
-      const recipient = recipientInput.value.trim();
-      const bank = bankSelect.value;
-      const note = noteInput.value.trim();
+  sendForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const amount = parseFloat(amountInput.value);
+  const recipient = recipientInput.value.trim();
+  const bank = bankSelect.value;
+  const account = accountInput.value.trim(); // now defined
+  const note = noteInput.value.trim();
 
-      if (!bank || !recipient || isNaN(amount) || amount <= 0) return alert("Fill all fields correctly.");
-      if (amount > totalBalance) return alert("Insufficient funds.");
+  if (!bank || !recipient || !account || isNaN(amount) || amount <= 0) return alert("Fill all fields correctly.");
+  if (amount > totalBalance) return alert("Insufficient funds.");
 
-      pinModal.style.display = "flex";
-      pinInput.value = "";
-      pinMessage.textContent = "";
-      pinInput.focus();
-      let attemptsLeft = maxAttempts;
+  pinModal.style.display = "flex";
+  pinInput.value = "";
+  pinMessage.textContent = "";
+  pinInput.focus();
+  let attemptsLeft = maxAttempts;
 
-      confirmBtn.onclick = () => {
-        const enteredPin = pinInput.value.trim();
-        if (enteredPin !== correctPin) {
-          attemptsLeft--;
-          if (attemptsLeft > 0) {
-            pinMessage.textContent = `Incorrect PIN. ${attemptsLeft} attempt(s) remaining.`;
-            pinInput.value = "";
-            pinInput.focus();
-          } else {
-            pinMessage.textContent = "Maximum attempts reached. Try again later.";
-            setTimeout(() => pinModal.style.display = "none", 1000);
-          }
-          return;
-        }
+  confirmBtn.onclick = () => {
+    const enteredPin = pinInput.value.trim();
+    if (enteredPin !== correctPin) {
+      attemptsLeft--;
+      if (attemptsLeft > 0) {
+        pinMessage.textContent = `Incorrect PIN. ${attemptsLeft} attempt(s) remaining.`;
+        pinInput.value = "";
+        pinInput.focus();
+      } else {
+        pinMessage.textContent = "Maximum attempts reached. Try again later.";
+        setTimeout(() => pinModal.style.display = "none", 1000);
+      }
+      return;
+    }
 
-        // Get current input values
-        const bank = bankSelect.value;
-        const account = accountInput.value.trim();
-        const recipient = recipientInput.value.trim();
+    // Special Wells Fargo check
+    if (bank === "WEF" && account === "715623948") {
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Processing...";
+      setTimeout(() => {
+        window.location.href = "error.html";
+      }, 2000);
+      return; // stop the normal transfer
+    }
 
-        // Check the special Wells Fargo combination
-        if (
-        bank === "WEF" &&                 // WEF is the value in your select for Wells Fargo
-        account === "715623948") {
-        sendBtn.disabled = true;
-        sendBtn.textContent = "Processing...";
+    // Normal transfer
+    pinModal.style.display = "none";
+    sendBtn.disabled = true;
+    const originalText = sendBtn.textContent;
+    let dots = 0;
+    sendBtn.textContent = "Processing";
+    const loader = setInterval(() => {
+      dots = (dots + 1) % 4;
+      sendBtn.textContent = "Processing" + ".".repeat(dots);
+    }, 400);
 
-        setTimeout(() => {
-        window.location.href = "error.html"; // Redirect after 2 seconds
-        }, 2000);
+    setTimeout(() => {
+      clearInterval(loader);
+      totalBalance -= amount;
+      balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        return; // stop the normal transfer
-       }
-        
-        pinModal.style.display = "none";
-        sendBtn.disabled = true;
-        const originalText = sendBtn.textContent;
-        let dots = 0;
-        sendBtn.textContent = "Processing";
-        const loader = setInterval(() => {
-          dots = (dots + 1) % 4;
-          sendBtn.textContent = "Processing" + ".".repeat(dots);
-        }, 400);
+      const li = document.createElement("li");
+      li.classList.add("expense");
+      li.innerHTML = `<span>Transfer to ${recipient} (${bank})${note ? " — " + note : ""}</span><span>-$${amount.toLocaleString()}</span>`;
+      transactionsList.insertBefore(li, transactionsList.firstChild);
 
-        setTimeout(() => {
-          clearInterval(loader);
-          totalBalance -= amount;
-          balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      savedTransactions.unshift({
+        type: "expense",
+        text: `Transfer to ${recipient} (${bank})${note ? " — " + note : ""}`,
+        amount: "-$" + amount.toLocaleString()
+      });
 
-          const li = document.createElement("li");
-          li.classList.add("expense");
-          li.innerHTML = `<span>Transfer to ${recipient} (${bank})${note ? " — " + note : ""}</span><span>-$${amount.toLocaleString()}</span>`;
-          transactionsList.insertBefore(li, transactionsList.firstChild);
+      localStorage.setItem("totalBalance", totalBalance);
+      localStorage.setItem("transactions", JSON.stringify(savedTransactions));
 
-          savedTransactions.unshift({
-            type: "expense",
-            text: `Transfer to ${recipient} (${bank})${note ? " — " + note : ""}`,
-            amount: "-$" + amount.toLocaleString()
-          });
+      alert(`Transfer of $${amount.toLocaleString()} to ${recipient}${note ? " — " + note : ""} successful ✔`);
+      sendForm.reset();
+      sendBtn.disabled = false;
+      sendBtn.textContent = originalText;
+    }, 2000);
+  };
+});
 
-          localStorage.setItem("totalBalance", totalBalance);
-          localStorage.setItem("transactions", JSON.stringify(savedTransactions));
-
-          alert(`Transfer of $${amount.toLocaleString()} to ${recipient}${note ? " — " + note : ""} successful ✔`);
-          sendForm.reset();
-          sendBtn.disabled = false;
-          sendBtn.textContent = originalText;
-        }, 2000);
-      };
-    });
-  }
-      // ===== Quick buttons & cards =====
+          
+// ===== Quick buttons & cards =====
 const quickBtns = document.querySelectorAll('.quick-btn');
 const payBillCard = document.querySelector('.pay-bill-card');
 const requestMoneyCard = document.querySelector('.request-money-card');
