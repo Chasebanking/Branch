@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ===== DEMO USER =====
+  let demoUser = JSON.parse(localStorage.getItem("demoUser"));
+  if (!demoUser) {
+    demoUser = {
+      fullName: "Charles Williams",
+      email: "Charlesweahh@gmail.com",
+      phone: "+1 510 367 1796",
+      password: "1346000",
+      emailNotif: true,
+      smsNotif: false
+    };
+    localStorage.setItem("demoUser", JSON.stringify(demoUser));
+  }
   // ===== INITIAL TRANSACTIONS =====
   let savedTransactions = JSON.parse(localStorage.getItem("transactions"));
   if (!savedTransactions || savedTransactions.length === 0) {
