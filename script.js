@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
             messageEl.style.color = "red";
             messageEl.textContent = "Invalid username or password.";
           }
-          alert("Invalid username or password.");
         }
       }, 1500);
     });
@@ -242,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("totalBalance", totalBalance);
       localStorage.setItem("transactions", JSON.stringify(savedTransactions));
 
-      alert(`Transfer of $${amount.toLocaleString()} to ${recipient}${note ? " — " + note : ""} successful ✔`);
       sendForm.reset();
       sendBtn.disabled = false;
       sendBtn.textContent = originalText;
@@ -340,7 +338,6 @@ if (payBillForm && balanceEl && transactionsList) {
     li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
     transactionsList.insertBefore(li, transactionsList.firstChild);
 
-    alert("Bill paid successfully ✔");
     payBillForm.reset();
   });
 }
@@ -375,7 +372,6 @@ if (requestMoneyForm && transactionsList) {
     li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
     transactionsList.insertBefore(li, transactionsList.firstChild);
 
-    alert("Money request sent ✔");
     requestMoneyForm.reset();
   });
 }
