@@ -371,6 +371,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+   // ===== PROFILE PANEL =====
+const profileBtn = document.getElementById("profile-btn");
+const profilePanel = document.getElementById("profile-panel");
+const closeProfileBtn = document.getElementById("close-profile");
+const editProfileBtn = document.getElementById("edit-profile");
+const accountSettingsBtn = document.getElementById("account-settings");
+
+if (profileBtn && profilePanel) {
+  profileBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
+  });
+}
+
+if (closeProfileBtn) closeProfileBtn.addEventListener("click", () => profilePanel.style.display = "none");
+
+document.addEventListener("click", e => {
+  if (profilePanel && profilePanel.style.display === "block" && !profilePanel.contains(e.target) && !profileBtn.contains(e.target)) {
+    profilePanel.style.display = "none";
+  }
+});
+
+if (editProfileBtn) editProfileBtn.addEventListener("click", () => window.location.href = "profile.html");
+if (accountSettingsBtn) accountSettingsBtn.addEventListener("click", () => window.location.href = "account.html");
+
   // ===== BALANCE TOGGLE =====
   const balanceToggleBtn = document.getElementById("toggle-balance");
   const sensitiveBalances = document.querySelectorAll(".sensitive");
