@@ -388,3 +388,4 @@ document.addEventListener("DOMContentLoaded", () => {
       URL.revokeObjectURL(link.href);
     };
   }
+});
