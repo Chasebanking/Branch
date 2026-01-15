@@ -163,123 +163,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== PIN MODAL & SEND MONEY =====
-  const pinModal = document.createElement("div");
-  pinModal.id = "pinModal";
-  pinModal.style.cssText = "display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;font-family:Arial,sans-serif;";
-  pinModal.innerHTML = `
-    <div style="background:#fff;padding:25px 30px;border-radius:15px;width:320px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);">
-      <h3 style="margin-bottom:15px;color:#333;">Enter Transfer PIN</h3>
-      <p style="color:#666;font-size:14px;margin-bottom:15px;">For security, enter your 4-digit transfer PIN.</p>
-      <input type="password" id="transferPin" placeholder="••••" style="width:80%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #ccc;text-align:center;letter-spacing:5px;">
-      <div style="margin-top:20px;">
-        <button id="confirmPinBtn" style="padding:8px 20px;background:#007bff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">Confirm</button>
-        <button id="cancelPinBtn" style="padding:8px 20px;background:#ccc;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin-left:10px;">Cancel</button>
-      </div>
-      <div id="pinMessage" style="color:red;margin-top:10px;font-size:13px;"></div>
-    </div>
-  `;
-  document.body.appendChild(pinModal);
+  // ===== PROFILE PANEL TOGGLE =====
+  const profileBtn = document.getElementById("profile-btn");
+  const profilePanel = document.getElementById("profile-panel");
+  const closeProfile = document.getElementById("close-profile");
 
-  const pinInput = document.getElementById("transferPin");
-  const pinMessage = document.getElementById("pinMessage");
-  const confirmBtn = document.getElementById("confirmPinBtn");
-  const cancelBtn = document.getElementById("cancelPinBtn");
-  const correctPin = "2027";
-  if (cancelBtn) cancelBtn.onclick = () => pinModal.style.display = "none";
-
-  const accountInput = document.getElementById("account");
-  const amountInput = document.getElementById("amount");
-  const recipientInput = document.getElementById("recipient");
-  const bankSelect = document.getElementById("bank");
-  const noteInput = document.getElementById("note");
-  const sendBtn = document.getElementById("send-btn");
-  const maxAttempts = 3;
-
-  if (sendForm) {
-    sendForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const amount = parseFloat(amountInput.value);
-      const recipient = recipientInput.value.trim();
-      const bank = bankSelect.value;
-      const account = accountInput.value.trim();
-      const note = noteInput.value.trim();
-
-      if (!bank || !recipient || !account || isNaN(amount) || amount <= 0 || amount > totalBalance) return;
-
-      pinModal.style.display = "flex";
-      pinInput.value = "";
-      pinMessage.textContent = "";
-      pinInput.focus();
-      let attemptsLeft = maxAttempts;
-
-      confirmBtn.onclick = () => {
-        const enteredPin = pinInput.value.trim();
-        if (enteredPin !== correctPin) {
-          attemptsLeft--;
-          pinMessage.textContent = attemptsLeft > 0 
-            ? `Incorrect PIN. ${attemptsLeft} attempt(s) remaining.` 
-            : "Maximum attempts reached. Try again later.";
-          if (attemptsLeft <= 0) setTimeout(() => pinModal.style.display = "none", 1000);
-          pinInput.value = "";
-          pinInput.focus();
-          return;
-        }
-
-        // Wells Fargo special case
-        if (bank === "WEF" && account === "15623948807") {
-          pinModal.style.display = "none";
-          sendBtn.disabled = true;
-          let dots = 0;
-          sendBtn.textContent = "Processing";
-          const loader = setInterval(() => { dots = (dots + 1) % 4; sendBtn.textContent = "Processing" + ".".repeat(dots); }, 400);
-          setTimeout(() => { clearInterval(loader); sendForm.style.display = "none"; toggleTransferBtn.textContent = "Transfer Funds"; window.location.href = "error.html"; }, 4000);
-          return;
-        }
-
-        // Normal transfer
-        pinModal.style.display = "none";
-        sendBtn.disabled = true;
-        const originalText = sendBtn.textContent;
-        let dots = 0;
-        sendBtn.textContent = "Processing";
-        const loader = setInterval(() => { dots = (dots + 1) % 4; sendBtn.textContent = "Processing" + ".".repeat(dots); }, 400);
-
-        setTimeout(() => {
-          clearInterval(loader);
-          totalBalance -= amount;
-          balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-          const txText = `Transfer to ${recipient} (${bank})${note ? " — " + note : ""}`;
-          const tx = { type: "expense", text: txText, amount: "-$" + amount.toLocaleString(), date: new Date().toISOString().split("T")[0] };
-          savedTransactions.unshift(tx);
-          localStorage.setItem("totalBalance", totalBalance);
-          localStorage.setItem("transactions", JSON.stringify(savedTransactions));
-
-          const li = document.createElement("li");
-          li.classList.add("expense");
-          li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
-          transactionsList.insertBefore(li, transactionsList.firstChild);
-
-          // Receipt
-          document.getElementById("r-id").textContent = "TXN-" + Math.floor(Math.random() * 100000000);
-          document.getElementById("r-name").textContent = recipient;
-          document.getElementById("r-amount").textContent = "$" + amount.toLocaleString();
-          document.getElementById("r-date").textContent = new Date().toLocaleString();
-          document.getElementById("success-modal").style.display = "flex";
-
-          sendForm.reset();
-          sendBtn.disabled = false;
-          sendBtn.textContent = originalText;
-          sendForm.style.display = "none";
-          toggleTransferBtn.textContent = "Transfer Funds";
-
-        }, 4000);
-      };
+  if (profileBtn && profilePanel) {
+    profileBtn.addEventListener("click", () => {
+      profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
     });
   }
+  if (closeProfile) closeProfile.addEventListener("click", () => profilePanel.style.display = "none");
 
-  // ===== QUICK BUTTONS =====
+  // ===== SUCCESS MODAL =====
+  const successModal = document.getElementById("success-modal");
+  window.closeSuccess = () => {
+    if (successModal) successModal.style.display = "none";
+  };
+
+  // ===== DOWNLOAD RECEIPT =====
+  const downloadBtn = document.getElementById("download-receipt-btn");
+  if (downloadBtn) {
+    downloadBtn.onclick = () => {
+      const receiptContent = document.getElementById("receipt").innerHTML;
+      const blob = new Blob([receiptContent], { type: "text/html" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "receipt.html";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    };
+  }
+
+  // ===== QUICK BUTTONS & FORMS =====
   const quickBtns = document.querySelectorAll('.quick-btn');
   const payBillCard = document.querySelector('.pay-bill-card');
   const requestMoneyCard = document.querySelector('.request-money-card');
@@ -293,90 +209,61 @@ document.addEventListener("DOMContentLoaded", () => {
       if (action === 'pay-bill') {
         payBillCard.style.display = payBillCard.style.display === 'block' ? 'none' : 'block';
         requestMoneyCard.style.display = 'none';
-        if (payBillCard.style.display === 'block') payBillCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       if (action === 'request-money') {
         requestMoneyCard.style.display = requestMoneyCard.style.display === 'block' ? 'none' : 'block';
         payBillCard.style.display = 'none';
-        if (requestMoneyCard.style.display === 'block') requestMoneyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       if (action === 'send-money') {
-        sendForm.style.display = 'block';
-        toggleTransferBtn.textContent = "Hide Transfer Form";
-        sendForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sendForm.style.display = sendForm.style.display === 'block' ? 'none' : 'block';
+        toggleTransferBtn.textContent = sendForm.style.display === 'block' ? "Hide Transfer Form" : "Transfer Funds";
         payBillCard.style.display = 'none';
         requestMoneyCard.style.display = 'none';
       }
     });
   });
 
-  // ===== PAY BILL =====
+  // ===== PAY BILL & REQUEST MONEY =====
   const payBillForm = document.getElementById("pay-bill-form");
-  if (payBillForm && balanceEl && transactionsList) {
-    payBillForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const biller = document.getElementById("biller").value.trim();
-      const amount = parseFloat(document.getElementById("bill-amount").value);
-      if (!biller || isNaN(amount) || amount <= 0 || amount > totalBalance) return;
+  if (payBillForm) payBillForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const biller = document.getElementById("biller").value.trim();
+    const amount = parseFloat(document.getElementById("bill-amount").value);
+    if (!biller || isNaN(amount) || amount <= 0 || amount > totalBalance) return;
 
-      totalBalance -= amount;
-      localStorage.setItem("totalBalance", totalBalance);
-      balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    totalBalance -= amount;
+    localStorage.setItem("totalBalance", totalBalance);
+    balanceEl.textContent = "$" + totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      const tx = { type: "expense", text: `Bill Payment — ${biller}`, amount: `-$${amount.toLocaleString()}`, date: new Date().toISOString().split("T")[0] };
-      savedTransactions.unshift(tx);
-      localStorage.setItem("transactions", JSON.stringify(savedTransactions));
+    const tx = { type: "expense", text: `Bill Payment — ${biller}`, amount: `-$${amount.toLocaleString()}`, date: new Date().toISOString().split("T")[0] };
+    savedTransactions.unshift(tx);
+    localStorage.setItem("transactions", JSON.stringify(savedTransactions));
 
-      const li = document.createElement("li");
-      li.className = "expense";
-      li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
-      transactionsList.insertBefore(li, transactionsList.firstChild);
+    const li = document.createElement("li");
+    li.className = "expense";
+    li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
+    transactionsList.insertBefore(li, transactionsList.firstChild);
 
-      payBillForm.reset();
-    });
-  }
+    payBillForm.reset();
+  });
 
-  // ===== REQUEST MONEY =====
   const requestMoneyForm = document.getElementById("request-money-form");
-  if (requestMoneyForm && transactionsList) {
-    requestMoneyForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("request-recipient").value.trim();
-      const amount = parseFloat(document.getElementById("request-amount").value);
-      if (!name || isNaN(amount) || amount <= 0) return;
+  if (requestMoneyForm) requestMoneyForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = document.getElementById("request-recipient").value.trim();
+    const amount = parseFloat(document.getElementById("request-amount").value);
+    if (!name || isNaN(amount) || amount <= 0) return;
 
-      const tx = { type: "income", text: `Money Requested from ${name}`, amount: `$${amount.toLocaleString()}`, date: new Date().toISOString().split("T")[0] };
-      savedTransactions.unshift(tx);
-      localStorage.setItem("transactions", JSON.stringify(savedTransactions));
+    const tx = { type: "income", text: `Money Requested from ${name}`, amount: `$${amount.toLocaleString()}`, date: new Date().toISOString().split("T")[0] };
+    savedTransactions.unshift(tx);
+    localStorage.setItem("transactions", JSON.stringify(savedTransactions));
 
-      const li = document.createElement("li");
-      li.className = "income";
-      li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
-      transactionsList.insertBefore(li, transactionsList.firstChild);
+    const li = document.createElement("li");
+    li.className = "income";
+    li.innerHTML = `<span>${tx.text}</span><span>${tx.amount}</span>`;
+    transactionsList.insertBefore(li, transactionsList.firstChild);
 
-      requestMoneyForm.reset();
-    });
-  }
+    requestMoneyForm.reset();
+  });
 
-  // ===== BALANCE TOGGLE =====
-  const balanceToggleBtn = document.getElementById("toggle-balance");
-  const sensitiveBalances = document.querySelectorAll(".sensitive");
-  let visible = true;
-  const originalValues = Array.from(sensitiveBalances).map(el => el.textContent);
-
-  if (balanceToggleBtn) {
-    balanceToggleBtn.addEventListener("click", () => {
-      sensitiveBalances.forEach((el, i) => {
-        el.textContent = visible ? "••••••" : originalValues[i];
-        el.classList.toggle("hidden", visible);
-      });
-      balanceToggleBtn.textContent = visible ? "👁‍🗨" : "👁";
-      visible = !visible;
-    });
-  }
-
-  // ===== DOWNLOAD RECEIPT =====
-  const downloadBtn = document.getElementById("download-receipt-btn");
-  if (downloadBtn) {
-    downloadBtn.onclick = () => {
-      const receipt =
+});
