@@ -215,15 +215,44 @@
   <h2>Front Page – Payment Receipt</h2>
   <hr>
 
-  <p><strong>Status:</strong> Transfer Successful</p>
-  <p><strong>Transaction ID:</strong> <span id="r-id"></span></p>
-  <p><strong>Recipient:</strong> <span id="r-name"></span></p>
-  <p><strong>Amount:</strong> $<span id="r-amount"></span></p>
-  <p><strong>Date:</strong> <span id="r-date"></span></p>
+  <!-- Transaction Info -->
+  <p><strong>Transaction ID:</strong> <span id="r-id">[Insert Transaction ID]</span></p>
+  <p><strong>Reference Number:</strong> <span id="r-ref">[Insert Reference Number]</span></p>
+  <p><strong>Payment Date:</strong> <span id="r-date">[Insert Payment Date]</span></p>
+  <p><strong>Time‑Stamp:</strong> <span id="r-time">HH:MM:SS — UTC</span></p>
+
+  <hr>
+
+  <!-- Transfer Details -->
+  <h3>Transfer Details</h3>
+  <p><strong>Payment Amount:</strong> $<span id="r-amount">[Insert Amount]</span></p>
+  <p><strong>Transaction Fee:</strong> $<span id="r-fee">0.00</span></p>
+
+  <hr>
+
+  <!-- Account Info -->
+  <h3>Account Information</h3>
+  <p><strong>From Account:</strong> JPMorgan Chase Bank, N.A. (****8433)</p>
+  <p><strong>To Account:</strong> <span id="r-recipient">[Insert Beneficiary Name / Account Details]</span></p>
+
+  <hr>
+
+  <!-- Authorization -->
+  <h3>Authorization Statement</h3>
+  <p>
+    I hereby confirm that I have authorized an electronic debit from my payment account in the amount stated above. 
+    This transaction was approved by the account holder and processed in accordance with applicable banking regulations.
+  </p>
+
+  <hr>
+
+  <!-- Transaction Status -->
+  <p><strong>Transaction Status:</strong> Completed / Successful</p>
 
   <hr>
   <small>This receipt was generated electronically.</small>
 </div>
+  
   
 </body>
 </html>
