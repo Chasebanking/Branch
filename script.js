@@ -477,7 +477,7 @@ if (cancelPinBtn) {
   });
 }
 
-    // ===== TOGGLE TRANSFER FORM =====
+  // ===== TOGGLE TRANSFER FORM =====
     if (toggleTransferBtn && sendForm) {
       toggleTransferBtn.addEventListener("click", () => {
         const isVisible = sendForm.style.display === "block";
@@ -601,46 +601,26 @@ if (cancelPinBtn) {
     // ===== PROFILE PANEL =====
     const profileBtn = $("profile-btn");
     const profilePanel = $("profile-panel");
-    const profileConnector = $("profile-connector");
     const closeProfileBtn = $("close-profile");
     const editProfileBtn = $("edit-profile");
     const accountSettingsBtn = $("account-settings");
 
     if (profileBtn && profilePanel) {
-    profileBtn.addEventListener("click", e => {
-    e.stopPropagation();
-
-    const isOpen = profilePanel.style.display === "block";
-
-    profilePanel.style.display = isOpen ? "none" : "block";
-
-    if (profileConnector) {
-      profileConnector.style.display = isOpen ? "none" : "flex";
+      profileBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        profilePanel.style.display = profilePanel.style.display === "block" ? "none" : "block";
+      });
     }
-  });
-  }
 
-    if (closeProfileBtn) closeProfileBtn.addEventListener("click", () => {
-    if (profilePanel) profilePanel.style.display = "none";   // hide the profile panel
-    if (profileConnector) profileConnector.style.display = "none"; // ✅ hide the connector too
-   });
+    if (closeProfileBtn) closeProfileBtn.addEventListener("click", () => { if (profilePanel) profilePanel.style.display = "none"; });
 
-    // Only add profile panel click listener if on dashboard page
-    if (window.location.pathname.endsWith("dashboard.html")) {
     document.addEventListener("click", e => {
-    if (
-      profilePanel &&
-      profilePanel.style.display === "block" &&
-      !profilePanel.contains(e.target) &&
-      profileBtn &&
-      !profileBtn.contains(e.target)
-    ) {
-      profilePanel.style.display = "none";
-      if (profileConnector) profileConnector.style.display = "none";
-    }
-  });
-}
+      if (profilePanel && profilePanel.style.display === "block" && !profilePanel.contains(e.target) && profileBtn && !profileBtn.contains(e.target)) {
+        profilePanel.style.display = "none";
+      }
+    });
 
-// Independent listeners for profile actions
-if (editProfileBtn) editProfileBtn.addEventListener("click", () => window.location.href = "profile.html");
-if (accountSettingsBtn) accountSettingsBtn.addEventListener("click", () => window.location.href = "account.html");
+    if (editProfileBtn) editProfileBtn.addEventListener("click", () => window.location.href = "profile.html");
+    if (accountSettingsBtn) accountSettingsBtn.addEventListener("click", () => window.location.href = "account.html");
+  });
+})();
