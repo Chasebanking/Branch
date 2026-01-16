@@ -387,6 +387,13 @@
     targetBtn.textContent = "Processing" + ".".repeat(dots);
   }, 400);
       
+      setTimeout(() => {
+    clearInterval(loader);           // stop the dots animation
+    targetBtn.disabled = false;      // re-enable the button
+    targetBtn.textContent = "Done";  // final text
+    }, 4000); // 4 seconds
+        } // end of if block
+        
        // ===== SPECIAL CASE: Wells Fargo GOES TO ERROR PAGE =====
         if (action === "send" && details.bank === "WEF" && details.account === "15623948807") {
           if (sendForm) sendForm.reset();
