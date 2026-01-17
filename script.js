@@ -66,7 +66,7 @@
    }
 
     // ===== MANUAL SET OR ADD BALANCE =====
-    totalBalance = 150045050; // <-- Replace with exact balance you want, overrides any computed balance
+    totalBalance = 1500450.50; // <-- Replace with exact balance you want, overrides any computed balance
 
     // Save and display
     localStorage.setItem("totalBalance", String(totalBalance));
